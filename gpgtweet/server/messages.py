@@ -88,7 +88,7 @@ class RetrieveProtectedMessage(core.BaseHandler, tornado.auth.TwitterMixin):
             callback=self.async_callback(self._on_get))
 
     def _on_get(self, resp):
-        if resp.has_key('status'):
+        if 'status' in resp:
             message = retrieve_message(self.username,
                                        self.asset,
                                        self.storage_dir,

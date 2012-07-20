@@ -4,6 +4,8 @@ import tornado.auth
 from gpgtweet.server import core
 from gpgtweet.server import utils
 
+import json
+
 class SignOutHandler(core.BaseHandler):
     def get(self):
         self.clear_cookie('access_token')
@@ -12,6 +14,9 @@ class SignOutHandler(core.BaseHandler):
 class SignInHandler(core.BaseHandler, tornado.auth.TwitterMixin):
     @tornado.web.asynchronous
     def get(self):
+        self.show_tokens = False
+        if self.get_argument("showme", None):
+            self.show_tokens = True
         if self.get_argument("oauth_token", None):
             self.get_authenticated_user(self.async_callback(self._on_auth))
             return
@@ -24,7 +29,13 @@ class SignInHandler(core.BaseHandler, tornado.auth.TwitterMixin):
         access_token['protected'] = user['protected']
         cookie_data = tornado.escape.json_encode(access_token)
         self.set_secure_cookie("access_token", cookie_data) 
-        self.redirect('/test')
+        if self.show_tokens:
+            data = {'oauth_token': access_token['key'],
+                    'oauth_token_secret': access_token['secret']}
+            self.write(json.dumps(data))
+            self.finish()
+        else:
+            self.redirect('/test')
 
 class ReAuthHandler(core.BaseHandler):
     def post(self):

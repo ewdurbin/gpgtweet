@@ -15,7 +15,6 @@ class GPGTweetConfig:
             storage_dir = config.get('GPGTweet', 'storage_dir') 
             storage_dir = os.path.expanduser(storage_dir)
             self.storage_dir = os.path.abspath(storage_dir)
-            print self.storage_dir
             self.cookie_secret = config.get('Tornado', 'cookie_secret') 
             self.consumer_key = config.get('TwitterApi', 'consumer_key')
             self.consumer_secret = config.get('TwitterApi', 'consumer_secret')

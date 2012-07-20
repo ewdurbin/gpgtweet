@@ -1,5 +1,6 @@
 
 import tornado.auth
+from twitter import TwitterError
 
 from gpgtweet.server import core
 from gpgtweet.server import utils
@@ -35,20 +36,24 @@ class SignInHandler(core.BaseHandler, tornado.auth.TwitterMixin):
             self.write(json.dumps(data))
             self.finish()
         else:
-            self.redirect('/test')
+            self.redirect('/')
 
 class ReAuthHandler(core.BaseHandler):
     def post(self):
         secret = self.get_argument('oauth_secret')
         token = self.get_argument('oauth_token')
         if secret and token: 
-            api = utils.get_twitter_api(token, secret)
-            twitter_user = api.VerifyCredentials()
-            access_token = {'oauth_token': token,
-                            'oauth_token_secret': secret,
-                            'screen_name': twitter_user.name,
-                            'protected': twitter_user.protected,
-                            'user_id': twitter_user.id} 
-            cookie_data = tornado.escape.json_encode(access_token)
-            self.set_secure_cookie("access_token", cookie_data) 
-            self.redirect('/test')
+            settings = self.settings
+            api = utils.get_twitter_api(token, secret, settings)
+            try:
+                twitter_user = api.VerifyCredentials()
+                access_token = {'oauth_token': token,
+                                'oauth_token_secret': secret,
+                                'screen_name': twitter_user.screen_name,
+                                'protected': twitter_user.protected,
+                                'user_id': twitter_user.id} 
+                cookie_data = tornado.escape.json_encode(access_token)
+                self.set_secure_cookie("access_token", cookie_data) 
+                self.redirect('/')
+            except TwitterError:
+                self.send_error(status_code=401)

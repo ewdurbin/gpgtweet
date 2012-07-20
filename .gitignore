@@ -27,7 +27,8 @@ pip-log.txt
 .mr.developer.cfg
 
 #Python VirtualEnv
-env
+env-server
+env-client
 
 #GPGTweetConfiguration File
 gpgtweet.cfg

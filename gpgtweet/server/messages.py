@@ -10,15 +10,13 @@ import string
 import random
 import os.path
 
-STORAGE_DIR = os.path.expanduser('~/.tweetmessage')
-
 def generate_id(size=6, chars=string.ascii_letters + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
-def message_store(user, message, protected=False):
-    dir_path = os.path.join(STORAGE_DIR, user)
+def message_store(user, message, storage_dir, protected=False):
+    dir_path = os.path.join(storage_dir, user)
     if protected:
-        dir_path = os.path.join(STORAGE_DIR, user, 'p')
+        dir_path = os.path.join(storage_dir, user, 'p')
     if not os.path.isdir(dir_path):
         os.makedirs(dir_path)
     id = generate_id()
@@ -37,7 +35,8 @@ class AcceptMessage(core.BaseHandler):
         user = self.get_current_user() 
         message = self.decode_argument(self.get_argument('message'))
         protected = access_token['protected']
-        id = message_store(user, message, protected)
+        storage_dir = self.settings['storage_dir']
+        id = message_store(user, message, storage_dir, protected)
         strings = (self.get_current_root(), user, id)
         if protected:
             self.write("%s/retpro/%s/%s" % strings)
@@ -51,12 +50,12 @@ def parse_retrieve(uri_split):
     asset = uri_split[3]
     return (username, asset)
 
-def retrieve_message(user, asset, protected=False):
+def retrieve_message(user, asset, storage_dir, protected=False):
     if not user or not asset:
         return None
-    file_path = os.path.join(STORAGE_DIR, user, asset)
+    file_path = os.path.join(storage_dir, user, asset)
     if protected:
-        file_path = os.path.join(STORAGE_DIR, user, 'p', asset)
+        file_path = os.path.join(storage_dir, user, 'p', asset)
     if os.path.exists(file_path):
         with open(file_path, 'rU') as file:
             return file.read()
@@ -65,7 +64,8 @@ def retrieve_message(user, asset, protected=False):
 class RetrieveMessage(core.BaseHandler):
     def get(self):
         (username, asset) = parse_retrieve(self.request.uri.split("/"))
-        message = retrieve_message(username, asset)
+        storage_dir = self.settings['storage_dir']
+        message = retrieve_message(username, asset, storage_dir)
         if message: 
             self.write("<pre>\n")
             self.write(message)
@@ -79,6 +79,7 @@ class RetrieveProtectedMessage(core.BaseHandler, tornado.auth.TwitterMixin):
     def get(self):
         (self.username,
          self.asset) = parse_retrieve(self.request.uri.split("/"))
+        self.storage_dir = self.settings['storage_dir']
         access_token = self.get_access_token()
         self.twitter_request(
             "/users/show",
@@ -89,8 +90,9 @@ class RetrieveProtectedMessage(core.BaseHandler, tornado.auth.TwitterMixin):
     def _on_get(self, resp):
         if resp.has_key('status'):
             message = retrieve_message(self.username,
-                                             self.asset,
-                                             protected=True)
+                                       self.asset,
+                                       self.storage_dir,
+                                       protected=True)
             if message: 
                 self.write("<pre>\n")
                 self.write(message)

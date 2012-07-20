@@ -26,4 +26,8 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
+#Python VirtualEnv
 env
+
+#GPGTweetConfiguration File
+gpgtweet.cfg

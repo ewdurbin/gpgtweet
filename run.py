@@ -26,6 +26,10 @@ def parse_options():
     (options, args) = parser.parse_args()
     return (options, args)
 
+class RootHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write('gpgtweet.com')
+
 if __name__ == "__main__":
     (options, args) = parse_options()
 
@@ -47,6 +51,7 @@ if __name__ == "__main__":
         (r"/ret/.*", messages.RetrieveMessage),
         (r"/retpro/.*", messages.RetrieveProtectedMessage),
         (r"/signout", auth.SignOutHandler),
+        (r"/", RootHandler),
         ], **settings
     )
 

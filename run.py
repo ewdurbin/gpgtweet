@@ -1,5 +1,4 @@
 
-import sys
 from optparse import OptionParser
 
 import tornado.web
@@ -16,6 +15,14 @@ def parse_options():
                       help="Configuration File for GPGTweet Server",
                       default="gpgtweet.cfg", action="store", type="string",
                       dest="config_file")
+    parser.add_option('-a', '--listen-address',
+                      help="Listen Address for Tornado Server",
+                      default="127.0.0.1", action="store", type="string",
+                      dest="listen_address")
+    parser.add_option('-p', '--port',
+                      help="Port for Tornado Server",
+                      default="8888", action="store", type="int",
+                      dest="listen_port")
     (options, args) = parser.parse_args()
     return (options, args)
 
@@ -43,5 +50,5 @@ if __name__ == "__main__":
         ], **settings
     )
 
-    application.listen(8888, address="*")
+    application.listen(options.listen_port, address=options.listen_address)
     tornado.ioloop.IOLoop.instance().start()

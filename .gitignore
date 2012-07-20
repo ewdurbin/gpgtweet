@@ -29,6 +29,11 @@ pip-log.txt
 #Python VirtualEnv
 env-server
 env-client
+server-env
+client-env
 
 #GPGTweetConfiguration File
 gpgtweet.cfg
+
+#Vim Swap Files
+*.swp

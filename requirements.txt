@@ -1,2 +1,2 @@
-python-twitter
-tornado
+python-twitter==0.8.2
+tornado==2.3

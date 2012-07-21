@@ -47,8 +47,8 @@ class ReAuthHandler(core.BaseHandler):
             api = utils.get_twitter_api(token, secret, settings)
             try:
                 twitter_user = api.VerifyCredentials()
-                access_token = {'oauth_token': token,
-                                'oauth_token_secret': secret,
+                access_token = {'key': token,
+                                'secret': secret,
                                 'screen_name': twitter_user.screen_name,
                                 'protected': twitter_user.protected,
                                 'user_id': twitter_user.id} 

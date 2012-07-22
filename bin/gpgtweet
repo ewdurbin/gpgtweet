@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+from gpgtweet.client import client 
+
+client = client.GPGTweetClient()
+if not client.check_twitter_auth():
+    print "Client is not authorized"
+    client.oob_auth()
+    client.config.write()
+(message, signed_message) = client.set_message()
+client.set_status(message, signed_message)

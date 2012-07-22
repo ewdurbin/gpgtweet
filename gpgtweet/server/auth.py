@@ -33,8 +33,7 @@ class SignInHandler(core.BaseHandler, tornado.auth.TwitterMixin):
         if self.show_tokens:
             data = {'oauth_token': access_token['key'],
                     'oauth_token_secret': access_token['secret']}
-            self.write(json.dumps(data))
-            self.finish()
+            self.finish(json.dumps(data))
         else:
             self.redirect('/')
 
@@ -57,3 +56,27 @@ class ReAuthHandler(core.BaseHandler):
                 self.redirect('/')
             except TwitterError:
                 self.send_error(status_code=401)
+
+class OOBHandler(core.BaseHandler):
+    def get(self):
+        request_token = utils.get_request_token(self.settings)
+        if request_token:
+            request_token_data = tornado.escape.json_encode(request_token)
+            self.set_secure_cookie("request_token", request_token_data)
+            self.write("%s?oauth_token=%s" % (utils.AUTHORIZATION_URL,
+                                              request_token['oauth_token']))
+        else:
+            self.send_error(status_code=500)
+
+class OOBCatchHandler(core.BaseHandler):
+    def post(self):
+        request_token_data = self.get_secure_cookie("request_token")
+        self.clear_cookie("request_token")
+        request_token = tornado.escape.json_decode(request_token_data)
+        pin = self.get_argument('pin')
+        access_token = utils.convert_request_access(self.settings,
+                                                    request_token, pin)
+        if access_token:
+            self.write(tornado.escape.json_encode(access_token))
+        else:
+            self.send_error(status_code=401)

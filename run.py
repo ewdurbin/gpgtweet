@@ -46,6 +46,8 @@ if __name__ == "__main__":
     
     application = tornado.web.Application([
         (r"/signin", auth.SignInHandler),
+        (r"/signin/oob", auth.OOBHandler),
+        (r"/signin/oob/catch", auth.OOBCatchHandler),
         (r"/reauth", auth.ReAuthHandler),
         (r"/message", messages.AcceptMessage),
         (r"/ret/.*", messages.RetrieveMessage),

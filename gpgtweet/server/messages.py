@@ -28,20 +28,36 @@ def message_store(user, message, storage_dir, protected=False):
         file.write(message)
     return id
 
-class AcceptMessage(core.BaseHandler):
+class AcceptMessage(core.BaseHandler, tornado.auth.TwitterMixin):
     @tornado.web.authenticated
+    @tornado.web.asynchronous
     def post(self):
-        access_token = self.get_access_token()
         user = self.get_current_user() 
+        access_token = self.get_access_token()
         message = self.decode_argument(self.get_argument('message'))
+        signed_message = self.decode_argument(self.get_argument('smessage'))
+        tweet = self.decode_argument(self.get_argument('tweet', None))
         protected = access_token['protected']
         storage_dir = self.settings['storage_dir']
-        id = message_store(user, message, storage_dir, protected)
+        id = message_store(user, signed_message, storage_dir, protected)
         strings = (self.get_current_root(), user, id)
         if protected:
-            self.write("%s/retpro/%s/%s" % strings)
+            self.ret_url = "%s/retpro/%s/%s" % strings
         else:
-            self.write("%s/ret/%s/%s" % strings)
+            self.ret_url = "%s/ret/%s/%s" % strings
+        if tweet:
+            self.twitter_request(
+                "/statuses/update",
+                post_args={"status": "%s %s" % (message, self.ret_url)}, 
+                access_token=access_token,
+                callback=self.async_callback(self._on_post))
+        else:
+            self.finish(self.ret_url)
+
+    def _on_post(self, resp):
+        if not resp:
+            self.finish("Something Went Wrong!")
+        self.finish(self.ret_url)
 
 def parse_retrieve(uri_split):
     if len(uri_split) != 4 or uri_split[3] == '':

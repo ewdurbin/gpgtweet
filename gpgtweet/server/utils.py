@@ -20,13 +20,13 @@ def get_twitter_api(token, secret, settings):
                        access_token_key=token,
                        access_token_secret=secret)
 
-def get_request_token(settings):
+def get_request_token(settings, callback_uri="oob"):
     consumer_key = settings['twitter_consumer_key']
     consumer_secret = settings['twitter_consumer_secret']
     consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
     client = oauth.Client(consumer)
     resp, content = client.request(REQUEST_TOKEN_URL, method='POST',
-                                   body="oauth_callback=oob")
+                                   body="oauth_callback=%s" % callback_uri)
     if resp['status'] != '200':
         return None
     return dict(parse_qsl(content))

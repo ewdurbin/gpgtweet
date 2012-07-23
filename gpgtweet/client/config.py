@@ -8,15 +8,18 @@ class GPGTweetConfig:
         self.config_file = config_file
         self.oauth_token = None
         self.oauth_token_secret = None
-        self.api_provider = None
-        self.gnupg_home = None
+        self.api_provider = "https://gpgtweet.com"
+        self.gnupg_home = os.path.expanduser("~/.gnupg")
+        self.config = ConfigParser.RawConfigParser()
+        self.config.add_section('TwitterApi')
+        self.config.add_section('GPGTweet')
+        self.config.add_section('gnupg')
         if os.path.isfile(config_file):
-            self.config = ConfigParser.RawConfigParser()
             self.config.read(self.config_file)
             self.oauth_token = self.config.get('TwitterApi', 'oauth_token')
             self.oauth_token_secret = self.config.get('TwitterApi',
                                                       'oauth_token_secret')
-            self.api_provider = "http://gpgtweet.com:8888"
+            self.api_provider = "https://gpgtweet.com"
             self.gnupg_home = os.path.expanduser("~/.gnupg")
 
     def set_oauth_token(self, oauth_token):

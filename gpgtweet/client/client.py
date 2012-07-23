@@ -6,6 +6,8 @@ import urllib2
 import gnupg
 import getpass
 
+import json
+
 class GPGTweetClient:
 
     def __init__(self):

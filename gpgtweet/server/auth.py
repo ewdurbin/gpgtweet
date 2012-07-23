@@ -27,8 +27,7 @@ class SignInHandler(core.BaseHandler, tornado.auth.TwitterMixin):
         access_token['protected'] = user['protected']
         cookie_data = tornado.escape.json_encode(access_token)
         self.set_secure_cookie("access_token", cookie_data) 
-        else:
-            self.redirect('/')
+        self.redirect('/')
 
 class ReAuthHandler(core.BaseHandler):
     def post(self):

@@ -51,20 +51,20 @@ if __name__ == "__main__":
         'twitter_consumer_key': config.consumer_key,
         'twitter_consumer_secret': config.consumer_secret,
         'cookie_secret': config.cookie_secret,
-        'login_url': '/signin',
+        'login_url': '/auth/signin',
         #Non Tornado Settings:
         'storage_dir': config.storage_dir,
     }
     
     application = tornado.web.Application([
-        (r"/signin", auth.SignInHandler),
-        (r"/signin/oob", auth.OOBHandler),
-        (r"/signin/oob/catch", auth.OOBCatchHandler),
-        (r"/reauth", auth.ReAuthHandler),
-        (r"/message", messages.AcceptMessage),
-        (r"/ret/.*", messages.RetrieveMessage),
-        (r"/retpro/.*", messages.RetrieveProtectedMessage),
-        (r"/signout", auth.SignOutHandler),
+        (r"/auth/signin", auth.SignInHandler),
+        (r"/auth/reauth", auth.ReAuthHandler),
+        (r"/auth/signout", auth.SignOutHandler),
+        (r"/message/add", messages.AcceptMessage),
+        (r"/message/retrieve/.*", messages.RetrieveMessage),
+        (r"/message/retrievep/.*", messages.RetrieveProtectedMessage),
+        (r"/ret/.*" , messages.RetrieveMessage),
+        (r"/retpro/.*" , messages.RetrieveProtectedMessage),
         (r"/", RootHandler),
         ], **settings
     )

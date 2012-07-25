@@ -20,7 +20,7 @@ class GPGTweetClient:
             data = {'oauth_token': self.config.oauth_token,
                     'oauth_secret': self.config.oauth_token_secret}
             try:
-                resp = self.conn.make_request("%s/reauth" % self.config.api_provider,
+                resp = self.conn.make_request("%s/auth/reauth" % self.config.api_provider,
                                               data)
                 return True
             except urllib2.URLError:
@@ -29,11 +29,11 @@ class GPGTweetClient:
             return None
 
     def oob_auth(self):
-        resp = self.conn.make_request("%s/signin/oob" % self.config.api_provider)
+        resp = self.conn.make_request("%s/auth/signin?oob=true" % self.config.api_provider)
         print "Open URL in browser of choice:\n\t%s" % resp.read()
         pin = raw_input("Pin: ")
-        data = {'pin': pin}
-        resp = self.conn.make_request("%s/signin/oob/catch" % self.config.api_provider,
+        data = {'oauth_verifier': pin}
+        resp = self.conn.make_request("%s/auth/signin?oob=true" % self.config.api_provider,
                                       data)
         access_token = json.loads(resp.read())
         self.config.set_oauth_token(access_token['oauth_token'])
@@ -44,7 +44,7 @@ class GPGTweetClient:
         confirmed = False
         print "Confirm Message?"
         print message
-        if raw_input("y/n") == 'y':
+        if raw_input("y/n\n") == 'y':
             return message
         return None
 
@@ -67,7 +67,7 @@ class GPGTweetClient:
         return (message, signed_message)
 
     def set_status(self, message, signed_message):
-        self.conn.make_request("%s/message" % self.config.api_provider,
+        self.conn.make_request("%s/message/add" % self.config.api_provider,
                                {'message': message,
                                 'smessage': signed_message,
                                 'tweet': True})

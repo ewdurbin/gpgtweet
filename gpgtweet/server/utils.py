@@ -31,16 +31,16 @@ def get_request_token(settings, callback_uri="oob"):
         return None
     return dict(parse_qsl(content))
 
-def convert_request_access(settings, request_token, pin):
+def convert_request_access(settings, request_token, verifier):
     consumer_key = settings['twitter_consumer_key']
     consumer_secret = settings['twitter_consumer_secret']
     consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
     token = oauth.Token(request_token['oauth_token'],
                         request_token['oauth_token_secret'])
-    token.set_verifier(pin)
+    token.set_verifier(verifier)
     client  = oauth.Client(consumer, token)
     resp, content = client.request(ACCESS_TOKEN_URL, method='POST',
-                                   body='oauth_verifier=%s' % pin)
+                                   body='oauth_verifier=%s' % verifier)
     if resp['status'] != '200':
         return None
     return dict(parse_qsl(content))

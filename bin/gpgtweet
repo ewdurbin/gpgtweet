@@ -3,7 +3,7 @@
 from gpgtweet.client import client 
 
 client = client.GPGTweetClient()
-if not client.check_twitter_auth():
+while not client.check_twitter_auth():
     print "Client is not authorized"
     client.oob_auth()
     client.config.write()

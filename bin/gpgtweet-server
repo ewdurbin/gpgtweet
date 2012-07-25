@@ -29,7 +29,18 @@ def parse_options():
 
 class RootHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write('gpgtweet.com')
+        content = """<pre>
+gpgtweet.com
+
+github:
+ https://github.com/ewdurbin/gpgtweet
+
+Contact:
+ Ernest W. Durbin III
+ ernest@gpgtweet.com
+ @EWDurbin
+</pre>"""
+        self.write(content)
 
 if __name__ == "__main__":
     (options, args) = parse_options()

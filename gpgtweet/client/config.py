@@ -12,15 +12,15 @@ class GPGTweetConfig:
         self.api_provider = "https://gpgtweet.com"
         
     def _build_config(self):
-        config = ConfigParser.RawConfigParser()
+        config = ConfigParser.SafeConfigParser()
         config.add_section('TwitterApi')
-        config.set('TwitterApi', 'oauth_token', None)
-        config.set('TwitterApi', 'oauth_token_secret', None)
+        config.set('TwitterApi', 'oauth_token', '')
+        config.set('TwitterApi', 'oauth_token_secret', '')
         config.add_section('GPGTweet')
         config.set('GPGTweet', 'api_provider', 'https://gpgtweet.com')
         config.add_section('gnupg')
-        config.set('gnupg', 'signing_keyid', None)
-        config.set('gnupg', 'gnupg_home', None)
+        config.set('gnupg', 'signing_keyid', '')
+        config.set('gnupg', 'gnupg_home', '')
         return config
 
     def _read_config(self, config_file):

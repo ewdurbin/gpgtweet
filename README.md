@@ -6,12 +6,12 @@ simple service for publishing gpg signed tweets
 api
 ---
 
-# /auth/signin
+### /auth/signin
 
-# /auth/reauth
+### /auth/reauth
 
-# /auth/signout
+### /auth/signout
 
-# /message/add
+### /message/add
 
-# /message/retrieve
+### /message/retrieve

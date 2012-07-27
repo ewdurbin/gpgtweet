@@ -5,7 +5,6 @@ import os.path
 import tornado.web
 import tornado.ioloop
 
-from gpgtweet.server import utils
 from gpgtweet.server import auth 
 from gpgtweet.server import messages 
 from gpgtweet.server.config import GPGTweetConfig

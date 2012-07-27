@@ -15,12 +15,13 @@ def generate_id(size=6, chars=string.ascii_letters + string.digits):
     id_p = "%s.p" % id
     return (id, id_p)
 
-def message_store(user, message, storage_dir, protected=False):
+def message_store(user, message, storage_dir, signing_key=None, protected=False):
     dir_path = os.path.join(storage_dir, user)
     if not os.path.isdir(dir_path):
         os.makedirs(dir_path)
     (id, id_p) = generate_id()
     file_path = os.path.join(dir_path, id)
+    file_path_sk = os.path.join(dir_path, "%s.sk" % id)
     file_path_protected = os.path.join(dir_path, id_p)
     while os.path.exists(file_path) or os.path.exists(file_path_protected):
         (id, id_p) = generate_id()
@@ -30,6 +31,9 @@ def message_store(user, message, storage_dir, protected=False):
         file_path = file_path_protected
     with open(file_path, 'w') as file:
         file.write(message)
+    if signing_key:
+        with open(file_path_sk, 'w') as file:
+            file.write(signing_key)
     return id
 
 class AcceptMessage(core.BaseHandler, tornado.auth.TwitterMixin):
@@ -40,10 +44,11 @@ class AcceptMessage(core.BaseHandler, tornado.auth.TwitterMixin):
         access_token = self.get_access_token()
         message = self.decode_argument(self.get_argument('message'))
         signed_message = self.decode_argument(self.get_argument('smessage'))
+        signing_key = self.decode_argument(self.get_argument('skey', None))
         tweet = self.decode_argument(self.get_argument('tweet', None))
         protected = access_token['protected']
         storage_dir = self.settings['storage_dir']
-        id = message_store(user, signed_message, storage_dir, protected)
+        id = message_store(user, signed_message, storage_dir, signing_key=signing_key, protected=protected)
         strings = (self.get_current_root(), user, id)
         self.ret_url = "%s/ret/%s/%s" % strings
         if tweet:

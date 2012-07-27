@@ -47,7 +47,9 @@ class GPGTweetClient:
     def sign_message(self, message):
         passphrase = getpass.getpass("GPG Passphrase: ")
         try:
-            signed_message = self.gpg.sign(message, passphrase=passphrase)
+            signed_message = self.gpg.sign(message,
+                                           keyid=self.config.signing_keyid,
+                                           passphrase=passphrase)
         except ValueError:
             return None
         return signed_message

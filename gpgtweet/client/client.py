@@ -32,7 +32,7 @@ class GPGTweetClient:
 
     def oob_auth(self):
         resp = self.conn.make_request("%s/auth/signin?oob=true" % self.config.api_provider)
-        print "Open URL in browser of choice:\n\t%s" % resp.read()
+        print("Open URL in browser of choice:\n\t%s" % resp.read())
         pin = raw_input("Pin: ")
         data = {'oauth_verifier': pin}
         resp = self.conn.make_request("%s/auth/signin?oob=true" % self.config.api_provider, data)
@@ -58,7 +58,7 @@ class GPGTweetClient:
             message = self.get_message()
         signed_message = self.sign_message(message)
         while not signed_message:
-            print "Message failed to sign... passphrase correct?"
+            print("Message failed to sign... passphrase correct?")
             signed_message = self.sign_message(message)
         return (message, signed_message)
 

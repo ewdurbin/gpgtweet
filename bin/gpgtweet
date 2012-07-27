@@ -13,7 +13,7 @@ def confirm(prompt='Confirm', resp=False):
         if not ans:
             return resp
         if ans not in ['y', 'Y', 'n', 'N']:
-            print 'please enter y or n.'
+            print("please enter y or n.")
             continue
         if ans == 'y' or ans == 'Y':
             return True
@@ -21,16 +21,16 @@ def confirm(prompt='Confirm', resp=False):
             return False
 
 def confirm_messages(message, signed_message):
-    print "\nTweet:\n%s\n\nSigned Message:\n%s\n" % (message, signed_message)
+    print("\nTweet:\n%s\n\nSigned Message:\n%s\n" % (message, signed_message))
     return confirm(prompt="Confirm and Send?")
 
 client = client.GPGTweetClient()
 while not client.check_twitter_auth():
-    print "Client is not authorized"
+    print("Client is not authorized")
     client.oob_auth()
     client.config.write()
 confirmed = False
 while not confirmed:
     (message, signed_message) = client.set_message()
-    confirm_messages(message, signed_message)
+    confirmed = confirm_messages(message, signed_message)
 client.set_status(message, signed_message)

@@ -2,6 +2,14 @@
 
 from gpgtweet.client import client 
 
+class bcolors:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
 def confirm(prompt='Confirm', resp=False):
 
     prompt = '%s [%s]|%s: ' % (prompt, 'n', 'y')
@@ -21,8 +29,10 @@ def confirm(prompt='Confirm', resp=False):
             return False
 
 def confirm_messages(message, signed_message):
-    print("\nTweet:\n%s\n\nSigned Message:\n%s\n" % (message, signed_message))
-    return confirm(prompt="Confirm and Send?")
+    print("\nTweet:\n%s%s%s\n\nSigned Message:\n%s%s%s\n" % (bcolors.BLUE, message, bcolors.ENDC,
+                                                             bcolors.BLUE, signed_message, bcolors.ENDC))
+    prompt = "%sConfirm and Send?%s" % (bcolors.FAIL, bcolors.ENDC)
+    return confirm(prompt=prompt)
 
 client = client.GPGTweetClient()
 while not client.check_twitter_auth():

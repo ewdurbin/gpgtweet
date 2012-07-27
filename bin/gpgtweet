@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from gpgtweet.client import client 
+from string import Template
 
 class bcolors:
     HEADER = '\033[95m'
@@ -9,6 +10,14 @@ class bcolors:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
+
+confirm_template = Template("""Tweet:
+$color_open$message$close
+Signed By:
+$color_open$signed_by$close
+Signed Message:
+$color_open$signed_message$close
+""")
 
 def confirm(prompt='Confirm', resp=False):
 
@@ -28,9 +37,12 @@ def confirm(prompt='Confirm', resp=False):
         if ans == 'n' or ans == 'N':
             return False
 
-def confirm_messages(message, signed_message):
-    print("\nTweet:\n%s%s%s\n\nSigned Message:\n%s%s%s\n" % (bcolors.BLUE, message, bcolors.ENDC,
-                                                             bcolors.BLUE, signed_message, bcolors.ENDC))
+def confirm_messages(message, signed_by, signed_message):
+    print(confirm_template.substitute(color_open=bcolors.BLUE,
+                                      close=bcolors.ENDC,
+                                      message=message,
+                                      signed_by=signed_by,
+                                      signed_message=signed_message))
     prompt = "%sConfirm and Send?%s" % (bcolors.FAIL, bcolors.ENDC)
     return confirm(prompt=prompt)
 
@@ -42,5 +54,5 @@ while not client.check_twitter_auth():
 confirmed = False
 while not confirmed:
     (message, signed_message) = client.set_message()
-    confirmed = confirm_messages(message, signed_message)
+    confirmed = confirm_messages(message, client.user_string, signed_message)
 client.set_status(message, signed_message)

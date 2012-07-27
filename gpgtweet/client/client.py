@@ -17,6 +17,7 @@ class GPGTweetClient:
             self.gpg = gnupg.GPG(gnupghome=self.config.gnupg_home)
         else:
             self.gpg = gnupg.GPG()
+        self.user_string = None
 
     def check_twitter_auth(self):
         if self.config.oauth_token and self.config.oauth_token_secret:
@@ -52,6 +53,9 @@ class GPGTweetClient:
                                            passphrase=passphrase)
         except ValueError:
             return None
+        for line in signed_message.stderr.split("\n"):
+            if line.startswith('[GNUPG:] USERID_HINT '):
+                self.user_string = line.split('[GNUPG:] USERID_HINT ')[1]
         return signed_message
 
     def set_message(self):
@@ -67,5 +71,6 @@ class GPGTweetClient:
     def set_status(self, message, signed_message):
         self.conn.make_request("%s/message/add" % self.config.api_provider,
                                {'message': message,
+                                'skey': self.user_string,
                                 'smessage': signed_message,
                                 'tweet': True})
